@@ -1,7 +1,8 @@
-
 'use client';
 
+import { useState } from 'react';
 import { useForecasts, Forecast } from '../hooks/useForecasts';
+import { usePosts, Post, Reply } from '../hooks/usePosts';
 
 // Map predictions to emojis
 const predictionEmojis: { [key: string]: string } = {
@@ -17,18 +18,47 @@ const formatDate = (dateString: string) => {
   return `${date.getMonth() + 1}/${date.getDate()}`;
 };
 
+const formatDateTime = (dateString: string) => {
+  const date = new Date(dateString);
+  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+};
+
 export default function Home() {
-  const { forecasts, loading, error } = useForecasts();
+  const { forecasts, loading: forecastsLoading, error: forecastsError } = useForecasts();
+  const { posts, loading: postsLoading, error: postsError, createPost, createReply, likePost } = usePosts();
+
+  const [newPostContent, setNewPostContent] = useState('');
+  const [replyContent, setReplyContent] = useState<{ [key: number]: string }>({});
+  const [showReplyForm, setShowReplyForm] = useState<{ [key: number]: boolean }>({});
+
+  const handlePostSubmit = async () => {
+    if (newPostContent.trim()) {
+      await createPost('名無しさん', newPostContent);
+      setNewPostContent('');
+    }
+  };
+
+  const handleReplySubmit = async (postId: number) => {
+    if (replyContent[postId] && replyContent[postId].trim()) {
+      await createReply(postId, '名無しさん', replyContent[postId]);
+      setReplyContent({ ...replyContent, [postId]: '' });
+      setShowReplyForm({ ...showReplyForm, [postId]: false });
+    }
+  };
+
+  const handleLike = async (postId: number) => {
+    await likePost(postId);
+  };
 
   const todayForecast = forecasts.length > 0 ? forecasts[0] : null;
   const weeklyForecasts = forecasts.length > 1 ? forecasts.slice(1, 7) : [];
 
-  if (loading) {
+  if (forecastsLoading || postsLoading) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
 
-  if (error) {
-    return <div className="flex justify-center items-center min-h-screen">Error: {error.message}</div>;
+  if (forecastsError || postsError) {
+    return <div className="flex justify-center items-center min-h-screen">Error: {forecastsError?.message || postsError?.message}</div>;
   }
 
   return (
@@ -69,21 +99,58 @@ export default function Home() {
           <div className="max-w-2xl mx-auto">
             {/* Post Form */}
             <div className="bg-ocean-light p-4 rounded-lg mb-8">
-              <textarea className="w-full bg-ocean-deep p-2 rounded-md text-glow-blue" placeholder="今日の様子を教えて！"></textarea>
-              <button className="bg-accent-blue hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">投稿する</button>
+              <textarea
+                className="w-full bg-ocean-deep p-2 rounded-md text-glow-blue"
+                placeholder="今日の様子を教えて！"
+                value={newPostContent}
+                onChange={(e) => setNewPostContent(e.target.value)}
+              ></textarea>
+              <button
+                className="bg-accent-blue hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+                onClick={handlePostSubmit}
+              >
+                投稿する
+              </button>
             </div>
 
             {/* Posts */}
             <div className="space-y-6">
-              {/* Sample Post */}
-              <div className="bg-ocean-light p-4 rounded-lg">
-                <p className="text-sm text-gray-400">名無しさん 2025/07/02 21:00</p>
-                <p className="mt-2">今日は結構見れました！</p>
-                <div className="flex items-center mt-4 text-sm">
-                  <button className="text-accent-blue hover:text-white">いいね👍 12</button>
-                  <button className="ml-4 text-accent-blue hover:text-white">返信する</button>
+              {posts.map((post: Post) => (
+                <div key={post.id} className="bg-ocean-light p-4 rounded-lg">
+                  <p className="text-sm text-gray-400">{post.username} {formatDateTime(post.created_at)}</p>
+                  <p className="mt-2">{post.content}</p>
+                  <div className="flex items-center mt-4 text-sm">
+                    <button className="text-accent-blue hover:text-white" onClick={() => handleLike(post.id)}>いいね👍 {post.likes}</button>
+                    <button className="ml-4 text-accent-blue hover:text-white" onClick={() => setShowReplyForm({ ...showReplyForm, [post.id]: !showReplyForm[post.id] })}>返信する</button>
+                  </div>
+                  {showReplyForm[post.id] && (
+                    <div className="mt-4">
+                      <textarea
+                        className="w-full bg-ocean-deep p-2 rounded-md text-glow-blue"
+                        placeholder="返信を入力"
+                        value={replyContent[post.id] || ''}
+                        onChange={(e) => setReplyContent({ ...replyContent, [post.id]: e.target.value })}
+                      ></textarea>
+                      <button
+                        className="bg-accent-blue hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+                        onClick={() => handleReplySubmit(post.id)}
+                      >
+                        返信を投稿
+                      </button>
+                    </div>
+                  )}
+                  {post.replies && post.replies.length > 0 && (
+                    <div className="mt-4 pl-8 border-l border-gray-600 space-y-4">
+                      {post.replies.map((reply: Reply) => (
+                        <div key={reply.id} className="bg-ocean-deep p-3 rounded-lg">
+                          <p className="text-sm text-gray-400">{reply.username} {formatDateTime(reply.created_at)}</p>
+                          <p className="mt-1">{reply.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
