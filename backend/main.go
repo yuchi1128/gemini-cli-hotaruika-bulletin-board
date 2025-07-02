@@ -32,6 +32,12 @@ func main() {
 	forecastHandler := &handler.ForecastHandler{DB: db}
 	r.HandleFunc("/api/forecasts", forecastHandler.GetForecasts).Methods("GET")
 
+	postHandler := &handler.PostHandler{DB: db}
+	r.HandleFunc("/api/posts", postHandler.GetPosts).Methods("GET")
+	r.HandleFunc("/api/posts", postHandler.CreatePost).Methods("POST")
+	r.HandleFunc("/api/posts/{id}/replies", postHandler.CreateReply).Methods("POST")
+	r.HandleFunc("/api/posts/{id}/like", postHandler.LikePost).Methods("POST")
+
 	log.Println("Server started on :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
