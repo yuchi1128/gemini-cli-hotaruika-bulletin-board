@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&display=swap');
 
 @tailwind base;
@@ -5,7 +6,27 @@
 @tailwind utilities;
 
 body {
-  background-color: #0D1B2A;
-  color: #E0E1DD;
+  background-color: #0A1128; /* midnight-ocean */
+  color: #E0E1DD; /* glow-blue */
   font-family: 'Shippori Mincho', serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for a more refined look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0D1B2A; /* ocean-deep */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #778DA9; /* accent-blue */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8EE4AF; /* luminous-accent */
 }

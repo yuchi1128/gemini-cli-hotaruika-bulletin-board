@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -13,6 +14,8 @@ const config: Config = {
         'ocean-light': '#1B263B',
         'glow-blue': '#E0E1DD',
         'accent-blue': '#778DA9',
+        'midnight-ocean': '#0A1128', // Even darker background
+        'luminous-accent': '#8EE4AF', // A more vibrant glow color
       },
       animation: {
         blob: "blob 7s infinite",
