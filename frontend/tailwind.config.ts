@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -10,40 +9,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'ocean-deep': '#0D1B2A',
-        'ocean-light': '#1B263B',
-        'glow-blue': '#E0E1DD',
-        'accent-blue': '#778DA9',
-        'midnight-ocean': '#0A1128', // Even darker background
-        'luminous-accent': '#8EE4AF', // A more vibrant glow color
+        'deep-ocean': '#03045e',
+        'ocean-surface': '#0077b6',
+        'aqua-blue': '#00b4d8',
+        'light-blue': '#90e0ef',
+        'bright-cyan': '#caf0f8',
+        'glow-accent': '#80ffdb',
       },
       animation: {
-        blob: "blob 7s infinite",
-        "pulse-glow": "pulse-glow 2s infinite",
+        'fade-in': 'fadeIn 1s ease-in-out',
+        'slide-up': 'slideUp 0.5s ease-out',
+        'pulse-glow': 'pulseGlow 2.5s infinite ease-in-out',
       },
       keyframes: {
-        blob: {
-          "0%": {
-            transform: "translate(0px, 0px) scale(1)",
-          },
-          "33%": {
-            transform: "translate(30px, -50px) scale(1.1)",
-          },
-          "66%": {
-            transform: "translate(-20px, 20px) scale(0.9)",
-          },
-          "100%": {
-            transform: "translate(0px, 0px) scale(1)",
-          },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
-        "pulse-glow": {
-          "0%, 100%": {
-            opacity: "1",
-            textShadow: "0 0 5px rgba(224, 225, 221, 0.7), 0 0 10px rgba(224, 225, 221, 0.5)",
+        slideUp: {
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        pulseGlow: {
+          '0%, 100%': {
+            textShadow: '0 0 10px rgba(128, 255, 219, 0.7), 0 0 20px rgba(128, 255, 219, 0.7)',
           },
-          "50%": {
-            opacity: "0.7",
-            textShadow: "0 0 10px rgba(224, 225, 221, 1), 0 0 20px rgba(224, 225, 221, 0.8)",
+          '50%': {
+            textShadow: '0 0 20px rgba(128, 255, 219, 1), 0 0 30px rgba(128, 255, 219, 1)',
           },
         },
       },
